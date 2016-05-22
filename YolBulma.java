@@ -1,73 +1,87 @@
+package ayildiz;
+
 import java.util.LinkedList;
-public class YolBulma{
-	
-	static class Sehir{
-			//kuþ uçuþu mesafesi
-			private int flight_distance_to_ankara;
-			private String name;
-			//bir onceki sehirden bu þehre olan kara mesafesi
-			private int distance=0;
-			//bu þehirden gidilebilen þehirleri tutan baglý liste
-			LinkedList<Sehir>bagli_sehirler;
-			public Sehir(){}
-			public Sehir(String name,int flight_distance_to_ankara){
-				this.name=name;
-				this.flight_distance_to_ankara=flight_distance_to_ankara;
-				bagli_sehirler=new LinkedList<Sehir>();
-			}
-			//bu þehre bagli olan þehirleri ve aralarýndaki kara mesafelerini ekle
-			public void addSehir(Sehir sehir,int distance){
-				Sehir shr=new Sehir();
-				shr.distance=distance;
-				shr.name=sehir.name;
-				shr.flight_distance_to_ankara=sehir.flight_distance_to_ankara;
-				this.bagli_sehirler.add(shr);
-			}
-	}
-	//ziyaret edilecek olan sonraki þehri bull
-	public Sehir getNext(Sehir suanki,LinkedList<Sehir>visited,LinkedList<Sehir>tum_sehirler){
-		int i=0;
-		Sehir next=new Sehir();
-		//sonraki þehri baþta bu þehre bagli olan 0. sehir olarak al
-		next=new YolBulma().getForName(suanki.bagli_sehirler.get(i).name, tum_sehirler);
-		//bu þehir daha onceden ziyaret edilmiþse 1. sehri al
-		if(new YolBulma().is_visited(next, visited))
-			next=new YolBulma().getForName(suanki.bagli_sehirler.get(i+1).name, tum_sehirler);
-		for(i=1;i<suanki.bagli_sehirler.size();i++)
-			if(suanki.bagli_sehirler.get(i).flight_distance_to_ankara<next.flight_distance_to_ankara &&
-					!new YolBulma().is_visited(suanki.bagli_sehirler.get(i), visited))
-				next=new YolBulma().getForName(suanki.bagli_sehirler.get(i).name, tum_sehirler);
+
+public class YolBulma {
 		
-		return next;
+	static class Sehir{
+		//kuþ uçuþu mesafesi
+		private int flight_distance_to_ankara;
+		private String name;
+		//bir onceki sehirden bu þehre olan kara mesafesi
+		private int distance=0;
+		//bu þehirden gidilebilen þehirleri tutan baglý liste
+		LinkedList<Sehir>bagli_sehirler;
+		public Sehir(){}
+		public Sehir(String name,int flight_distance_to_ankara){
+			this.name=name;
+			this.flight_distance_to_ankara=flight_distance_to_ankara;
+			bagli_sehirler=new LinkedList<Sehir>();
+		}
+		//bu þehre bagli olan þehirleri ve aralarýndaki kara mesafelerini ekle
+		public void addSehir(Sehir sehir,int distance){
+			Sehir shr=new Sehir();
+			shr.distance=distance;
+			shr.name=sehir.name;
+			shr.flight_distance_to_ankara=sehir.flight_distance_to_ankara;
+			this.bagli_sehirler.add(shr);
+		}
 	}
-	//bir þehrin daha once ziyaret edilip edilmedigini bulan metot
-	 public boolean is_visited(Sehir shr,LinkedList<Sehir>visited){
-		 for (Sehir sehir : visited) {
-			if(shr.name==sehir.name)
-				return true;
+	
+	//ziyaret edilecek olan sonraki þehri bull
+		public Sehir getNext(Sehir suanki,LinkedList<Sehir>visited,LinkedList<Sehir>tum_sehirler,int maliyet){
+			int i=0;
+			Sehir next=new Sehir();
+			//sonraki þehri baþta bu þehre bagli olan 0. sehir olarak al
+			next=new YolBulma().getForName(suanki.bagli_sehirler.get(i).name, tum_sehirler);
+			//bu þehir daha onceden ziyaret edilmiþse 1. sehri al
+			if(new YolBulma().is_visited(next, visited))
+				next=new YolBulma().getForName(suanki.bagli_sehirler.get(i+1).name, tum_sehirler);
+			for(i=1;i<suanki.bagli_sehirler.size();i++)
+				if((suanki.bagli_sehirler.get(i).flight_distance_to_ankara+maliyet)<(next.flight_distance_to_ankara+maliyet)
+						&&!new YolBulma().is_visited(suanki.bagli_sehirler.get(i), visited))
+					next=new YolBulma().getForName(suanki.bagli_sehirler.get(i).name, tum_sehirler);
+			
+			return next;
 		}
-		 return false;
-	 }
-	 //þehir ismine gore main metodunda oluþturulmuþ þehirlerden birini geri donduren metot
-	 public Sehir getForName(String name,LinkedList<Sehir>tum_sehirler){
-		 for (Sehir sehir : tum_sehirler) {
-			if(sehir.name==name)
-				return sehir;
+		//bir þehrin daha once ziyaret edilip edilmedigini bulan metot
+		 public boolean is_visited(Sehir shr,LinkedList<Sehir>visited){
+			 for (Sehir sehir : visited) {
+				if(shr.name==sehir.name)
+					return true;
+			}
+			 return false;
+		 }
+		 //þehir ismine gore main metodunda oluþturulmuþ þehirlerden birini geri donduren metot
+		 public Sehir getForName(String name,LinkedList<Sehir>tum_sehirler){
+			 for (Sehir sehir : tum_sehirler) {
+				if(sehir.name==name)
+					return sehir;
+			}
+			 return null;
+		 }
+		//toplam mesafeyi bulan metot
+		public int getSumDistance(LinkedList<Sehir>list){
+			int toplam=0;
+			int i;
+			for(i=0;i<list.size()-1;i++){
+				String next_name=list.get(i+1).name;
+				for (Sehir sehir :list.get(i).bagli_sehirler)
+					if(sehir.name==next_name)
+						toplam+=sehir.distance;
+			}
+			return toplam;
 		}
-		 return null;
-	 }
-	//toplam mesafeyi bulan metot
-	public int getSumDistance(LinkedList<Sehir>list){
-		int toplam=0;
-		int i;
-		for(i=0;i<list.size()-1;i++){
-			String next_name=list.get(i+1).name;
-			for (Sehir sehir :list.get(i).bagli_sehirler)
-				if(sehir.name==next_name)
-					toplam+=sehir.distance;
+		//gidilecek yeni þehir seçildiyinde,onceki þehirden bu þehre olan mesafeyi bulan metot
+		public int getDistance(Sehir onceki,Sehir next){
+			String name=next.name;
+			for (Sehir shr: onceki.bagli_sehirler) {
+				if(shr.name==name)
+					return shr.distance;
+			}
+			return 0;
 		}
-		return toplam;
-	}
+		
 	public static void main(String[] args) {
 		LinkedList<Sehir>tum_sehirler=new LinkedList<Sehir>();
 		//þehirleri ve bunlarýn kuþ uçuþu mesafelerini oluþtur
@@ -134,9 +148,12 @@ public class YolBulma{
 		onceki=canakkale;
 		visited.add(onceki);
 		//gezmeye baþla
+		//mevcut þehre kadar olan maliyeti tutan deðiþken
+		int maliyet=0;
 		while(true){
 			Sehir next=new Sehir();
-			next=new YolBulma().getNext(onceki,visited,tum_sehirler);
+			next=new YolBulma().getNext(onceki,visited,tum_sehirler,maliyet);
+			maliyet+=new YolBulma().getDistance(onceki, next);
 			if(next.name=="ankara"){
 				//ankaraya kadar gelinmiþse donguden çýk
 				visited.add(ankara);
@@ -150,6 +167,8 @@ public class YolBulma{
 		for (Sehir sehir : visited)
 			System.out.println(sehir.name);
 		System.out.println("Toplma mesafe:"+new YolBulma().getSumDistance(visited));
+		
+		
 		
 	}
 }
